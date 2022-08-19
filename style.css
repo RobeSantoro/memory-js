@@ -41,10 +41,11 @@ h1 {
   padding: 10px;
 }
 
-a, .card {
+.card {
+  padding: 20px;
+  width: -webkit-fill-available;
+  font-size: 2em;
+  border-radius: 5%;
   cursor: pointer;
-  width: 100%;
-  height:fit-content;
-  border-radius: 0.5em;
   background-color: #363636;
 }
