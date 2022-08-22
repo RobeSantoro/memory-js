@@ -14,9 +14,9 @@ const colors = ['red', 'blue', 'green', 'cyan', 'yellow', 'magenta', 'black', 'o
 colors.push(...colors)
 
 // Shuffle Colors Array
-// colors.sort(() => {
-//   return Math.random() - 0.5;
-// })
+colors.sort(() => {
+  return Math.random() - 0.5;
+})
 
 const cards = []
 
@@ -85,7 +85,7 @@ cards.forEach(card => {
           flipped = []
           numFlipped = 0
 
-        }, 2000)
+        }, 1000)
         
         console.log(cards);
 
