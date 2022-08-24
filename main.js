@@ -1,22 +1,41 @@
 import './style.css'
 
-// DOM
 const app = document.getElementById('app')
-const h1 = document.createElement('h1')
-const board = document.createElement('div')
 
-board.className = 'board'
-
-app.appendChild(h1)
-app.appendChild(board)
 
 function newGame() {
   
-  h1.innerHTML = 'Memory'
-
-  let numFlipped = 0
-  let flipped = []
+  let flippedNum = 0
+  let flippedCards = []
   let moves = 0
+  let timer = 0
+  
+  // DOM
+  const container = document.createElement('div')
+  container.className = 'container'
+  app.appendChild(container)
+
+  const h1 = document.createElement('h1')
+  h1.innerText = 'Memory'
+  container.appendChild(h1)
+
+  const board = document.createElement('div')
+  board.className = 'board'
+  container.appendChild(board)
+
+  const ui = document.createElement('div')
+  ui.className = 'ui'
+  container.appendChild(ui)
+
+  const timerDisplay = document.createElement('p')
+  timerDisplay.innerText = `${timer} seconds`
+  timerDisplay.style.float = 'left'
+  ui.appendChild(timerDisplay)
+
+  const movesNum = document.createElement('p')
+  movesNum.innerText = `${moves} moves`
+  movesNum.style.float = 'right'
+  ui.appendChild(movesNum)
 
   // PREP ARRAYs
   const cards = []
@@ -51,29 +70,32 @@ function newGame() {
 
     card.element.addEventListener('mousedown', () => {
 
-      if (numFlipped < 2 && card.flipped == false) {
+      if (flippedNum < 2 && card.flipped == false) {
 
-        numFlipped++
-        flipped.push(card)
+        flippedNum++
+        flippedCards.push(card)
 
         card.flipped = true
         card.element.style.backgroundColor = card.color
 
         // MATCH
-        if (flipped.length == 2 && flipped[0].color == flipped[1].color) {
+        if (flippedCards.length == 2 && flippedCards[0].color == flippedCards[1].color) {
 
-          let index = cards.map(obj => obj.color).indexOf(flipped[0].color)
+          let index = cards.map(obj => obj.color).indexOf(flippedCards[0].color)
           cards.splice(index, 1) // SKETCHY
-          index = cards.map(obj => obj.color).indexOf(flipped[0].color)
+          index = cards.map(obj => obj.color).indexOf(flippedCards[0].color)
           cards.splice(index, 1) // SKETCHY
 
-          /* console.table(cards); */
+          // console.table(cards)
 
-          flipped = []
-          numFlipped = 0
+          flippedCards = []
+          flippedNum = 0
+          moves++
+
+          // console.log(moves);
 
           // WIN
-          if (cards.length == 0) {
+          if (cards.length == 14) {
 
             board.style.display = 'none'
             h1.innerHTML = 'YOU WIN!'
@@ -87,12 +109,13 @@ function newGame() {
               board.innerHTML = ''
               newGame();
               app.removeChild(playButton)
+              app.removeChild(container)
             })
           }
         }
 
         // NO MATCH
-        else if (flipped.length == 2) {
+        else if (flippedCards.length == 2) {
 
           setTimeout(() => {
             cards.forEach(card => {
@@ -102,11 +125,19 @@ function newGame() {
               }
             })
 
-            flipped = []
-            numFlipped = 0
+            flippedCards = []
+            flippedNum = 0
 
           }, 1000)
+
+          moves++
+
+          // console.log(moves)
+
         }
+
+        movesNum.innerText = `${moves} moves`
+
       }
     })
   })
