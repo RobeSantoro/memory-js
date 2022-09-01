@@ -54,6 +54,9 @@ h1 {
   border-radius: 5%;
   cursor: pointer;
   background-color: #363636;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .button {
@@ -77,9 +80,10 @@ input {
 
 .leaderBoard {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   /* grid-template-rows: repeat(10, 1fr); */
   grid-gap: 1em;
-  place-items: center;
+  place-items: left;
   padding: 10px;
+  text-align: left;
 }

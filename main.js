@@ -1,14 +1,47 @@
 import './style.css'
-import { uniqueNamesGenerator, NumberDictionary, names } from 'unique-names-generator';
+import { uniqueNamesGenerator, names } from 'unique-names-generator';
 
 const app = document.getElementById('app')
+const DEBUG_LEADERBOARD = true
 
-function newGame() {
+function createBackFaces(option) {
+
+  let backFaces = []
+
+  if (option == 'colors') {
+    const colors = [
+      'red', 'blue', 'green', 'cyan', 'yellow', 'magenta', 'black', 'orange'
+    ]
+
+    backFaces = colors
+  }
+
+  if (option == 'photos') {
+
+    const photos = [
+      "url('./public/photo_01.jpg')",
+      "url('./public/photo_02.jpg')",
+      "url('./public/photo_03.jpg')",
+      "url('./public/photo_04.jpg')",
+      "url('./public/photo_05.jpg')",
+      "url('./public/photo_06.jpg')",
+      "url('./public/photo_07.jpg')",
+      "url('./public/photo_08.jpg')",
+    ]
+
+    backFaces = photos
+  }
+
+  return backFaces
+}
+
+function newMemory(backFaces) {
 
   let flippedNum = 0
   let flippedCards = []
   let moves = 0
   let seconds = 0
+
   const leaderBoardObj = {}
 
   // BOARD
@@ -16,9 +49,9 @@ function newGame() {
   container.className = 'container'
   app.appendChild(container)
 
-  const h1 = document.createElement('h1')
-  h1.innerText = 'Memory'
-  container.appendChild(h1)
+  const h1Title = document.createElement('h1')
+  h1Title.innerText = 'Memory'
+  container.appendChild(h1Title)
 
   const board = document.createElement('div')
   board.className = 'board'
@@ -46,32 +79,41 @@ function newGame() {
   movesNum.style.float = 'right'
   ui.appendChild(movesNum)
 
-  // PREP ARRAYs
-  const cards = []
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-  const colors = ['red', 'blue', 'green', 'cyan', 'yellow', 'magenta', 'black', 'orange']
-
   // Duplicate and shuffle the color array
-  colors.push(...colors)
-  colors.sort(() => {
+  backFaces.push(...backFaces)
+  backFaces.sort(() => {
     return Math.random() - 0.5;
   })
 
-  // Card Creation
-  for (let i = 0; i < numbers.length; i++) {
+  const frontNumbers = []
 
-    const number = numbers[i]
-    const color = colors[i]
-    const element = document.createElement('button')
-    const card = { number, color, flipped: false, element }
+  for (let i = 0; i < backFaces.length; i++) {
+    frontNumbers.push(i + 1)
+  }
 
-    element.className = 'card'
-    element.id = card.number
-    element.innerHTML = card.number
+  // Cards Creation
+  const cards = []
+
+  for (let i = 0; i < frontNumbers.length; i++) {
+
+    const frontNumber = frontNumbers[i]
+    const backFace = backFaces[i]
+    const cardElement = document.createElement('button')
+    const cardObject = {
+      number: frontNumber,
+      backface: backFace,
+      flipped: false,
+      /* solved: false, */
+      element: cardElement
+    }
+
+    cardElement.className = 'card'
+    cardElement.id = cardObject.number
+    cardElement.innerHTML = cardObject.number
     board.style.display = 'grid'
-    board.appendChild(element)
+    board.appendChild(cardElement)
 
-    cards.push(card)
+    cards.push(cardObject)
   }
 
   // Cycle through created cards and game logic
@@ -79,21 +121,24 @@ function newGame() {
 
     card.element.addEventListener('mousedown', () => {
 
-      if (flippedNum < 2 && card.flipped == false) {
+      if (card.flipped == false && flippedNum < 2) {
 
         flippedNum++
         flippedCards.push(card)
 
         card.flipped = true
-        card.element.style.backgroundColor = card.color
+        card.element.style.backgroundColor = card.backface
+        card.element.style.backgroundImage = card.backface
+
+        card.element.style.color = 'rgba(0,0,0,0)'
 
         // MATCH
-        if (flippedCards.length == 2 && flippedCards[0].color == flippedCards[1].color ) {
+        if (flippedCards.length == 2 && flippedCards[0].backface == flippedCards[1].backface || DEBUG_LEADERBOARD) {
 
-          let indexToDelete = cards.map(obj => obj.color).indexOf(flippedCards[0].color)
+          let indexToDelete = cards.map(obj => obj.backface).indexOf(flippedCards[0].backface)
           cards.splice(indexToDelete, 1)
 
-          indexToDelete = cards.map(obj => obj.color).indexOf(flippedCards[0].color)
+          indexToDelete = cards.map(obj => obj.backface).indexOf(flippedCards[0].backface)
           cards.splice(indexToDelete, 1)
 
           flippedCards = []
@@ -101,12 +146,12 @@ function newGame() {
           moves++
 
           // WIN
-          if (cards.length == 0) {
+          if (cards.length == 0 || DEBUG_LEADERBOARD) {
 
             clearInterval(timer)
 
             board.style.display = 'none'
-            h1.innerHTML = 'YOU WIN!'
+            h1Title.innerHTML = 'YOU WIN!'
 
 
             // 4 LEADERBOARD
@@ -125,9 +170,12 @@ function newGame() {
 
             submitName.addEventListener('click', () => {
 
+              const date = new Date
+
               leaderBoardObj.name = inputName.value
               leaderBoardObj.moves = moves
               leaderBoardObj.seconds = seconds
+              leaderBoardObj.date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
 
               container.removeChild(ui)
               container.removeChild(inputName)
@@ -144,12 +192,15 @@ function newGame() {
             app.appendChild(playButton)
 
             playButton.addEventListener('click', () => {
+
               board.innerHTML = ''
               app.removeChild(playButton)
               if (document.querySelector('.container')) {
                 app.removeChild(container)
               }
-              newGame();
+
+              newMemory(createBackFaces('photos'))
+
             })
 
 
@@ -164,6 +215,7 @@ function newGame() {
               if (card.flipped == true) {
                 card.flipped = false
                 card.element.style = 'none'
+                card.element.style.color = 'rgba(255,255,255,1)'
               }
             })
 
@@ -178,13 +230,11 @@ function newGame() {
 
         movesNum.innerText = `${moves} moves`
 
-
-
       }
     })
   })
 
-  return leaderBoardObj
+  return
 }
 
 function addToLeaderBoard(leaderBoardObj) {
@@ -218,6 +268,8 @@ function addToLeaderBoard(leaderBoardObj) {
       return (a.moves + a.seconds) - (b.moves + b.seconds)
     })
 
+    actualLeaderBoard = actualLeaderBoard.slice(0,10)
+
     localStorage.setItem("Leader Board", JSON.stringify(actualLeaderBoard))
   }
 
@@ -229,37 +281,45 @@ function addToLeaderBoard(leaderBoardObj) {
     const name = leader.name
     const moves = leader.moves
     const secs = leader.seconds
+    const date = leader.date
 
-    createLeaderBoardRow(leaderBoardDiv, pos, name, moves, secs,)
+    createLeaderBoardRow(leaderBoardDiv, pos, name, moves, secs, date)
   }
 
+  return
 }
 
-function createLeaderBoardRow(
-  leaderBoardEl,
+function createLeaderBoardRow(leaderBoardDiv,
   pos = '',
   name = 'name',
   moves = 'moves',
-  secs = 'seconds') {
+  secs = 'secs',
+  date = 'date') {
 
   const leaderPosition = document.createElement('div')
   const leaderName = document.createElement('div')
   const leaderMoves = document.createElement('div')
   const leaderSeconds = document.createElement('div')
+  const leaderDate = document.createElement('div')
 
   leaderPosition.innerText = pos
   leaderName.innerText = name
   leaderMoves.innerText = moves
   leaderSeconds.innerText = secs
+  leaderDate.innerText = date
 
-  leaderBoardEl.appendChild(leaderPosition)
-  leaderBoardEl.appendChild(leaderName)
-  leaderBoardEl.appendChild(leaderMoves)
-  leaderBoardEl.appendChild(leaderSeconds)
+  leaderBoardDiv.appendChild(leaderPosition)
+  leaderBoardDiv.appendChild(leaderName)
+  leaderBoardDiv.appendChild(leaderMoves)
+  leaderBoardDiv.appendChild(leaderSeconds)
+  leaderBoardDiv.appendChild(leaderDate)
 
+  return leaderBoardDiv
 }
 
-newGame()
+
+newMemory(createBackFaces('photos'))
+
 
 
 
