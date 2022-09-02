@@ -2,7 +2,7 @@ import './style.css'
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 
 const app = document.getElementById('app')
-const DEBUG_LEADERBOARD = true
+const DEBUG_LEADERBOARD = false
 
 function createBackFaces(option) {
 
@@ -19,14 +19,14 @@ function createBackFaces(option) {
   if (option == 'photos') {
 
     const photos = [
-      "url('./public/photo_01.jpg')",
-      "url('./public/photo_02.jpg')",
-      "url('./public/photo_03.jpg')",
-      "url('./public/photo_04.jpg')",
-      "url('./public/photo_05.jpg')",
-      "url('./public/photo_06.jpg')",
-      "url('./public/photo_07.jpg')",
-      "url('./public/photo_08.jpg')",
+      "url('./photo_01.jpg')",
+      "url('./photo_02.jpg')",
+      "url('./photo_03.jpg')",
+      "url('./photo_04.jpg')",
+      "url('./photo_05.jpg')",
+      "url('./photo_06.jpg')",
+      "url('./photo_07.jpg')",
+      "url('./photo_08.jpg')",
     ]
 
     backFaces = photos
@@ -194,6 +194,7 @@ function newMemory(backFaces) {
             playButton.addEventListener('click', () => {
 
               board.innerHTML = ''
+
               app.removeChild(playButton)
               if (document.querySelector('.container')) {
                 app.removeChild(container)
@@ -248,6 +249,11 @@ function addToLeaderBoard(leaderBoardObj) {
   container.appendChild(leaderBoardDiv)
 
   createLeaderBoardRow(leaderBoardDiv)
+
+  if (DEBUG_LEADERBOARD == true) {
+    leaderBoardObj.seconds = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
+    leaderBoardObj.moves = Math.floor(Math.random() * (40 - 16 + 1)) + 16;
+  }
 
   // LEADERBOARD LOGIC
   let actualLeaderBoard = localStorage.getItem("Leader Board")
@@ -308,6 +314,11 @@ function createLeaderBoardRow(leaderBoardDiv,
   leaderSeconds.innerText = secs
   leaderDate.innerText = date
 
+  leaderPosition.style.textAlign = 'right'
+  leaderName.style.textAlign = 'left'
+  leaderName.style.border = '1px solid #fff;'
+
+
   leaderBoardDiv.appendChild(leaderPosition)
   leaderBoardDiv.appendChild(leaderName)
   leaderBoardDiv.appendChild(leaderMoves)
@@ -316,7 +327,6 @@ function createLeaderBoardRow(leaderBoardDiv,
 
   return leaderBoardDiv
 }
-
 
 newMemory(createBackFaces('photos'))
 
