@@ -318,7 +318,6 @@ function createLeaderBoardRow(leaderBoardDiv,
   leaderName.style.textAlign = 'left'
   leaderName.style.border = '1px solid #fff;'
 
-
   leaderBoardDiv.appendChild(leaderPosition)
   leaderBoardDiv.appendChild(leaderName)
   leaderBoardDiv.appendChild(leaderMoves)
@@ -328,7 +327,8 @@ function createLeaderBoardRow(leaderBoardDiv,
   return leaderBoardDiv
 }
 
-newMemory(createBackFaces('photos'))
+const backFaces = createBackFaces('photos')
+newMemory(backFaces)
 
 
 
